@@ -3,13 +3,15 @@ let rotationTimer = null;
 const ROTATION_INTERVAL = 30000; // 30秒轮换一次
 
 // 初始化
-chrome.runtime.onInstalled.addListener(function() {
-  // 初始化存储
-  chrome.storage.local.set({
-    chartList: [],
-    currentIndex: 0,
-    isRotating: false
-  });
+chrome.runtime.onInstalled.addListener(function(details) {
+  // 只在首次安装时初始化存储
+  if (details.reason === 'install') {
+    chrome.storage.local.set({
+      chartList: [],
+      currentIndex: 0,
+      isRotating: false
+    });
+  }
 });
 
 // 监听消息

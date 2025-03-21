@@ -1,0 +1,69 @@
+# .github/workflows/build-crx.yml
+
+name: Build Chrome Extension
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # 允许手动触发工作流
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - name: Install dependencies
+      run: npm install -g chrome-webstore-upload-cli crx3-utils
+
+    - name: Generate key (if not exists)
+      run: |
+        if [ ! -f key.pem ]; then
+          openssl genrsa -out key.pem 2048
+        fi
+
+    - name: Package extension
+      run: |
+        # 创建build文件夹
+        mkdir -p build
+        
+        # 复制所有必要文件到build文件夹
+        cp -r manifest.json popup.html popup.js popup.css background.js content.js icons build/
+        
+        # 使用生成的密钥创建CRX文件
+        crx3-utils pack -o build/chart-rotator.crx -p key.pem build/
+        
+        # 创建ZIP文件供Chrome Web Store使用
+        cd build && zip -r ../chart-rotator.zip *
+
+    - name: Upload CRX as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: chart-rotator-crx
+        path: build/chart-rotator.crx
+
+    - name: Upload ZIP as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: chart-rotator-zip
+        path: chart-rotator.zip
+
+    # 可选：上传到GitHub Release
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          build/chart-rotator.crx
+          chart-rotator.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
