@@ -82,6 +82,28 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Update updates.xml
+      run: |
+        # 获取扩展ID
+        EXTENSION_ID=$(openssl rsa -in key.pem -pubout -outform DER | openssl base64 -A)
+        
+        # 创建新的updates.xml内容
+        cat > updates.xml << EOF
+        <?xml version='1.0' encoding='UTF-8'?>
+        <gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
+          <app appid='$EXTENSION_ID'>
+            <updatecheck codebase='https://github.com/${{ github.repository }}/releases/download/v${{ github.run_number }}/chart-rotator.crx' version='${{ github.run_number }}' />
+          </app>
+        </gupdate>
+        EOF
+        
+        # 提交更新
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add updates.xml
+        git commit -m "Update extension version to v${{ github.run_number }}"
+        git push
+
     - name: Display Release URL
       run: |
         echo "Release created successfully!"
