@@ -33,6 +33,23 @@ jobs:
       run: |
         npm install -g chrome-webstore-upload-cli
         npm install -g crx
+        sudo apt-get update
+        sudo apt-get install -y librsvg2-bin
+
+    - name: Convert SVG to PNG
+      run: |
+        # 创建临时目录
+        mkdir -p temp_icons
+        
+        # 转换SVG为PNG
+        rsvg-convert -w 16 -h 16 icons/icon16.svg > temp_icons/icon16.png
+        rsvg-convert -w 48 -h 48 icons/icon48.svg > temp_icons/icon48.png
+        rsvg-convert -w 128 -h 128 icons/icon128.svg > temp_icons/icon128.png
+        
+        # 更新manifest.json中的图标路径
+        sed -i 's/icon16.svg/icon16.png/g' manifest.json
+        sed -i 's/icon48.svg/icon48.png/g' manifest.json
+        sed -i 's/icon128.svg/icon128.png/g' manifest.json
 
     - name: Generate key (if not exists)
       run: |
@@ -46,7 +63,7 @@ jobs:
         mkdir -p build
         
         # 复制所有必要文件到build文件夹
-        cp -r manifest.json popup.html popup.js popup.css background.js content.js icons build/
+        cp -r manifest.json popup.html popup.js popup.css background.js content.js temp_icons build/
         
         # 使用生成的密钥创建CRX文件
         crx pack build/ -o build/chart-rotator.crx -p key.pem
