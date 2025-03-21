@@ -44,7 +44,7 @@ jobs:
         cp -r manifest.json popup.html popup.js popup.css background.js content.js icons build/
         
         # 使用生成的密钥创建CRX文件
-        crx3-utils pack -o build/chart-rotator.crx -p key.pem build/
+        npx crx3-utils pack -o build/chart-rotator.crx -p key.pem build/
         
         # 创建ZIP文件供Chrome Web Store使用
         cd build && zip -r ../chart-rotator.zip *
