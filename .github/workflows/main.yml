@@ -26,7 +26,8 @@ jobs:
       run: |
         npm install -g chrome-webstore-upload-cli
         npm install -g crx3-utils
-        echo "$(npm bin -g)" >> $GITHUB_PATH
+        echo "export PATH=$PATH:$(npm bin -g)" >> $GITHUB_ENV
+        source $GITHUB_ENV
 
     - name: Generate key (if not exists)
       run: |
