@@ -34,12 +34,6 @@ jobs:
         npm install -g chrome-webstore-upload-cli
         npm install -g crx
 
-    - name: Generate key (if not exists)
-      run: |
-        if [ ! -f key.pem ]; then
-          openssl genrsa -out key.pem 2048
-        fi
-
     - name: Package extension
       run: |
         # 创建build文件夹
@@ -48,17 +42,8 @@ jobs:
         # 复制所有必要文件到build文件夹
         cp -r manifest.json popup.html popup.js popup.css background.js content.js icons build/
         
-        # 使用生成的密钥创建CRX文件
-        crx pack build/ -o build/chart-rotator.crx -p key.pem
-        
-        # 创建ZIP文件供Chrome Web Store使用
+        # 创建ZIP文件
         cd build && zip -r ../chart-rotator.zip *
-
-    - name: Upload CRX as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: chart-rotator-crx
-        path: build/chart-rotator.crx
 
     - name: Upload ZIP as artifact
       uses: actions/upload-artifact@v4
@@ -75,38 +60,22 @@ jobs:
           Chrome Extension build for run #${{ github.run_number }}
           - Built on: ${{ github.event.head_commit.timestamp }}
           - Commit: ${{ github.event.head_commit.message }}
-          - Download URL: https://github.com/${{ github.repository }}/releases/download/v1.0.${{ github.run_number }}/chart-rotator.crx
+          - Download URL: https://github.com/${{ github.repository }}/releases/download/v1.0.${{ github.run_number }}/chart-rotator.zip
+          
+          ## 安装说明
+          1. 下载并解压 chart-rotator.zip
+          2. 打开 Chrome 浏览器，进入扩展程序页面（chrome://extensions/）
+          3. 开启右上角的"开发者模式"
+          4. 点击"加载已解压的扩展程序"
+          5. 选择解压后的文件夹
         files: |
-          build/chart-rotator.crx
           chart-rotator.zip
         draft: false
         prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Update updates.xml
-      run: |
-        # 获取扩展ID
-        EXTENSION_ID=$(openssl rsa -in key.pem -pubout -outform DER | openssl base64 -A)
-        
-        # 创建新的updates.xml内容
-        cat > updates.xml << EOF
-        <?xml version='1.0' encoding='UTF-8'?>
-        <gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
-          <app appid='$EXTENSION_ID'>
-            <updatecheck codebase='https://github.com/${{ github.repository }}/releases/download/v1.0.${{ github.run_number }}/chart-rotator.crx' version='1.0.${{ github.run_number }}' />
-          </app>
-        </gupdate>
-        EOF
-        
-        # 提交更新
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add updates.xml
-        git commit -m "Update extension version to v1.0.${{ github.run_number }}"
-        git push origin main
-
     - name: Display Release URL
       run: |
         echo "Release created successfully!"
-        echo "Download URL: https://github.com/${{ github.repository }}/releases/download/v1.0.${{ github.run_number }}/chart-rotator.crx"
+        echo "Download URL: https://github.com/${{ github.repository }}/releases/download/v1.0.${{ github.run_number }}/chart-rotator.zip"
