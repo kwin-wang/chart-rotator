@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const urlList = document.getElementById('urlList');
     const toggleButton = document.getElementById('toggleButton');
     const nextButton = document.getElementById('nextButton');
+    const stopButton = document.getElementById('stopButton');
     const statusDisplay = document.getElementById('statusDisplay');
     const rotationIntervalInput = document.getElementById('rotationInterval');
     
@@ -106,6 +107,38 @@ document.addEventListener('DOMContentLoaded', function() {
       chrome.runtime.sendMessage({ action: 'nextChart' });
       // 短暂延迟后更新状态，以便获得最新信息
       setTimeout(updateRotationStatus, 300);
+    });
+    
+    // 停止按钮点击事件
+    stopButton.addEventListener('click', function() {
+      chrome.storage.local.get(['chartList'], function(data) {
+        const chartList = data.chartList || [];
+        
+        if (chartList.length === 0) {
+          alert('请先添加至少一个URL');
+          return;
+        }
+        
+        // 停止轮播并重置状态
+        chrome.storage.local.set({ 
+          isRotating: false,
+          currentIndex: 0
+        }, function() {
+          // 发送消息到后台脚本
+          chrome.runtime.sendMessage({ 
+            action: 'stopRotation',
+            shouldReset: true
+          }, function(response) {
+            console.log('后台脚本响应:', response);
+            if (chrome.runtime.lastError) {
+              console.error('消息发送错误:', chrome.runtime.lastError);
+            }
+          });
+          
+          // 更新UI
+          updateRotationStatus();
+        });
+      });
     });
     
     // 加载URL列表

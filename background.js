@@ -26,7 +26,7 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
           sendResponse({ status: 'started' });
           break;
         case 'stopRotation':
-          await stopRotation();
+          await stopRotation(message.shouldReset);
           sendResponse({ status: 'stopped' });
           break;
         case 'nextChart':
@@ -65,6 +65,12 @@ async function startRotation() {
   // 立即加载当前图表
   await loadChart(chartList[currentIndex].url);
   
+  // 重置状态
+  await chrome.storage.local.set({ 
+    isRotating: true,
+    lastRotationTime: Date.now() // 添加最后轮播时间记录
+  });
+  
   // 设置定时器
   rotationTimer = setInterval(async () => {
     await rotateToNextChart();
@@ -72,17 +78,45 @@ async function startRotation() {
   
   // 更新图标状态
   await updateBadgeForRotation(true);
+  
+  // 通知content script重置状态
+  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (tabs.length > 0) {
+    await chrome.tabs.sendMessage(tabs[0].id, { action: 'resetStatus' });
+  }
 }
 
 // 停止轮播
-async function stopRotation() {
+async function stopRotation(shouldReset = false) {
   if (rotationTimer) {
     clearInterval(rotationTimer);
     rotationTimer = null;
   }
   
+  // 更新storage状态
+  await chrome.storage.local.set({ 
+    isRotating: false,
+    lastRotationTime: shouldReset ? null : Date.now() // 如果是停止操作，清除最后轮播时间
+  });
+  
   // 更新图标状态
-  await updateBadgeForRotation(false);
+  if (shouldReset) {
+    // 如果是停止操作，清除图标文字和背景色
+    await chrome.action.setBadgeText({ text: '' });
+    await chrome.action.setBadgeBackgroundColor({ color: '#4a6cf7' });
+  } else {
+    // 如果是暂停操作，显示暂停图标
+    await chrome.action.setBadgeText({ text: '❚❚' });
+    await chrome.action.setBadgeBackgroundColor({ color: '#ff9f43' });
+  }
+  
+  // 如果需要重置，发送消息到content script
+  if (shouldReset) {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tabs.length > 0) {
+      await chrome.tabs.sendMessage(tabs[0].id, { action: 'hideStatus' });
+    }
+  }
 }
 
 // 切换到下一个图表
@@ -113,7 +147,16 @@ async function rotateToNextChart() {
 async function loadChart(url) {
   const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
   if (tabs.length > 0) {
+    // 先更新URL
     await chrome.tabs.update(tabs[0].id, { url: url });
+    
+    // 等待页面加载完成后再更新最后轮播时间
+    chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo, tab) {
+      if (tabId === tabs[0].id && changeInfo.status === 'complete') {
+        chrome.storage.local.set({ lastRotationTime: Date.now() });
+        chrome.tabs.onUpdated.removeListener(listener);
+      }
+    });
   } else {
     await chrome.tabs.create({ url: url });
   }
