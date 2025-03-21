@@ -7,10 +7,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const toggleButton = document.getElementById('toggleButton');
     const nextButton = document.getElementById('nextButton');
     const statusDisplay = document.getElementById('statusDisplay');
+    const rotationIntervalInput = document.getElementById('rotationInterval');
     
     // 初始化
     loadChartList();
     updateRotationStatus();
+    loadRotationInterval();
+    
+    // 加载轮播间隔时间
+    function loadRotationInterval() {
+      chrome.storage.local.get('rotationInterval', function(data) {
+        if (data.rotationInterval) {
+          rotationIntervalInput.value = data.rotationInterval;
+        }
+      });
+    }
+    
+    // 保存轮播间隔时间
+    function saveRotationInterval() {
+      const interval = parseInt(rotationIntervalInput.value);
+      if (interval >= 5 && interval <= 3600) {
+        chrome.storage.local.set({ rotationInterval: interval });
+      }
+    }
+    
+    // 监听轮播间隔时间变化
+    rotationIntervalInput.addEventListener('change', saveRotationInterval);
     
     // 添加新URL
     addButton.addEventListener('click', function() {
@@ -49,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 切换轮播状态
     toggleButton.addEventListener('click', function() {
-      chrome.storage.local.get(['isRotating', 'chartList'], function(data) {
+      chrome.storage.local.get(['isRotating', 'chartList', 'rotationInterval'], function(data) {
         const isRotating = data.isRotating || false;
         const chartList = data.chartList || [];
         
@@ -58,13 +80,15 @@ document.addEventListener('DOMContentLoaded', function() {
           return;
         }
         
+        // 保存当前的轮播间隔时间
+        saveRotationInterval();
+        
         // 切换轮播状态
         chrome.storage.local.set({ isRotating: !isRotating }, function() {
           // 发送消息到后台脚本
           chrome.runtime.sendMessage({ 
             action: !isRotating ? 'startRotation' : 'stopRotation' 
           }, function(response) {
-            // 添加回调以检查消息是否被接收
             console.log('后台脚本响应:', response);
             if (chrome.runtime.lastError) {
               console.error('消息发送错误:', chrome.runtime.lastError);

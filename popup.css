@@ -127,6 +127,26 @@
   .control-buttons {
     display: flex;
     gap: 10px;
+    align-items: center;
+  }
+  
+  .interval-input {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .interval-input label {
+    font-size: 14px;
+    color: #2f3542;
+  }
+  
+  .interval-input input {
+    width: 60px;
+    padding: 5px;
+    border: 1px solid #dfe4ea;
+    border-radius: 4px;
+    font-size: 14px;
   }
   
   .paused-button {

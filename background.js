@@ -1,6 +1,6 @@
 // 全局变量
 let rotationTimer = null;
-const ROTATION_INTERVAL = 30000; // 30秒轮换一次
+const DEFAULT_ROTATION_INTERVAL = 30000; // 默认30秒轮换一次
 
 // 初始化
 chrome.runtime.onInstalled.addListener(function(details) {
@@ -9,7 +9,8 @@ chrome.runtime.onInstalled.addListener(function(details) {
     chrome.storage.local.set({
       chartList: [],
       currentIndex: 0,
-      isRotating: false
+      isRotating: false,
+      rotationInterval: 30 // 默认30秒
     });
   }
 });
@@ -52,9 +53,10 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 async function startRotation() {
   await stopRotation(); // 确保之前的定时器被清除
   
-  const data = await chrome.storage.local.get(['chartList', 'currentIndex']);
+  const data = await chrome.storage.local.get(['chartList', 'currentIndex', 'rotationInterval']);
   const chartList = data.chartList || [];
   let currentIndex = data.currentIndex || 0;
+  const rotationInterval = (data.rotationInterval || 30) * 1000; // 转换为毫秒
   
   if (chartList.length === 0) {
     return;
@@ -66,7 +68,7 @@ async function startRotation() {
   // 设置定时器
   rotationTimer = setInterval(async () => {
     await rotateToNextChart();
-  }, ROTATION_INTERVAL);
+  }, rotationInterval);
   
   // 更新图标状态
   await updateBadgeForRotation(true);

@@ -1,6 +1,6 @@
 // 内容脚本 - 当前版本只需显示倒计时状态
 let countdownElement = null;
-const ROTATION_INTERVAL = 30000;
+let rotationInterval = 30000; // 默认30秒
 
 // 创建倒计时元素
 function createCountdownElement() {
@@ -47,13 +47,14 @@ function hideStatus() {
 // 轮询检查轮播状态
 let lastTime = Date.now();
 let statusInterval = setInterval(function() {
-  chrome.storage.local.get(['isRotating', 'currentIndex'], function(data) {
+  chrome.storage.local.get(['isRotating', 'currentIndex', 'rotationInterval'], function(data) {
     const isRotating = data.isRotating || false;
+    rotationInterval = (data.rotationInterval || 30) * 1000; // 更新轮播间隔时间
     
     if (isRotating) {
       const now = Date.now();
       const elapsed = now - lastTime;
-      const secondsLeft = Math.max(0, Math.floor((ROTATION_INTERVAL - elapsed) / 1000));
+      const secondsLeft = Math.max(0, Math.floor((rotationInterval - elapsed) / 1000));
       
       showStatus(true, secondsLeft);
       
