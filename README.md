@@ -42,7 +42,7 @@
 
 ## 📷 截图
 
-![Chart Rotator 截图](screenshots/main.png)
+![Chart Rotator 截图](chart-rotator-ui.svg)
 
 ## 🛠️ 开发者信息
 
