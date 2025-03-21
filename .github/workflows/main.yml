@@ -25,9 +25,7 @@ jobs:
     - name: Install dependencies
       run: |
         npm install -g chrome-webstore-upload-cli
-        npm install -g crx3-utils
-        echo "export PATH=$PATH:$(npm bin -g)" >> $GITHUB_ENV
-        source $GITHUB_ENV
+        npm install -g crx
 
     - name: Generate key (if not exists)
       run: |
@@ -44,7 +42,7 @@ jobs:
         cp -r manifest.json popup.html popup.js popup.css background.js content.js icons build/
         
         # 使用生成的密钥创建CRX文件
-        npx crx3-utils pack -o build/chart-rotator.crx -p key.pem build/
+        crx pack build/ -o build/chart-rotator.crx -p key.pem
         
         # 创建ZIP文件供Chrome Web Store使用
         cd build && zip -r ../chart-rotator.zip *
