@@ -23,7 +23,10 @@ jobs:
         node-version: '16'
 
     - name: Install dependencies
-      run: npm install -g chrome-webstore-upload-cli crx3-utils
+      run: |
+        npm install -g chrome-webstore-upload-cli
+        npm install -g crx3-utils
+        echo "$(npm bin -g)" >> $GITHUB_PATH
 
     - name: Generate key (if not exists)
       run: |
