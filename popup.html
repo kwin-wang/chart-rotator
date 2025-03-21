@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chart Rotator</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Chart Rotator</h1>
+    
+    <div class="input-group">
+      <input type="text" id="chartName" placeholder="标的名称...">
+      <input type="text" id="chartUrl" placeholder="输入图表URL...">
+      <button id="addButton">添加</button>
+    </div>
+    
+    <h2>已添加的URL</h2>
+    <div class="url-list" id="urlList">
+      <!-- URL列表将通过JavaScript动态添加 -->
+    </div>
+    
+    <div class="control-panel">
+      <div id="statusDisplay">当前显示: -</div>
+      <div class="control-buttons">
+        <button id="toggleButton">开始</button>
+        <button id="nextButton">下一个</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

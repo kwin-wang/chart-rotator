@@ -1,0 +1,134 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  }
+  
+  body {
+    background-color: #f5f7fa;
+  }
+  
+  .container {
+    width: 500px;
+    padding: 15px;
+  }
+  
+  h1 {
+    font-size: 18px;
+    color: white;
+    background-color: #4a6cf7;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+  }
+  
+  h2 {
+    font-size: 16px;
+    color: #2f3542;
+    margin: 15px 0 10px 0;
+  }
+  
+  .input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  #chartName {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #dfe4ea;
+    border-radius: 4px;
+  }
+  
+  #chartUrl {
+    flex: 2;
+    padding: 10px;
+    border: 1px solid #dfe4ea;
+    border-radius: 4px;
+  }
+  
+  button {
+    padding: 10px 15px;
+    background-color: #4a6cf7;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  button:hover {
+    background-color: #3a5ce5;
+  }
+  
+  .url-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #dfe4ea;
+    border-radius: 4px;
+    background-color: white;
+    margin-bottom: 15px;
+  }
+  
+  .url-item {
+    padding: 8px 10px;
+    margin: 5px;
+    background-color: #f1f2f6;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .url-name {
+    font-weight: bold;
+    margin-right: 10px;
+    min-width: 120px;
+  }
+  
+  .url-address {
+    color: #a4b0be;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .delete-btn {
+    background-color: #ff6b81;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+  }
+  
+  .control-panel {
+    background-color: #f1f2f6;
+    padding: 15px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  #statusDisplay {
+    font-size: 14px;
+  }
+  
+  .control-buttons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .paused-button {
+    background-color: #ff9f43;
+  }

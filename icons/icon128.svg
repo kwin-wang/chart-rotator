@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- 背景圆形 -->
+  <circle cx="64" cy="64" r="64" fill="#4a6cf7"/>
+  
+  <!-- 内部浅色圆形 -->
+  <circle cx="64" cy="64" r="58" fill="#5a79f7"/>
+  
+  <!-- 图表折线 -->
+  <polyline points="16,74 32,48 48,64 64,38 80,58 96,32 112,48" 
+    stroke="white" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- 循环箭头 -->
+  <path d="M30,96 A40,40 0 0 0 98,96" 
+    stroke="white" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M98,96 L110,84 L98,72" 
+    stroke="white" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
