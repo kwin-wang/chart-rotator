@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
+  <app appid='MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8lcbD7RQlt1Db9EOoqkcK+BFgeExlljO6Zprnu83fzfj+a8vFqlGVRFp8a2w96cjKhkSssTS+rTAYVMrLB3y3NqQl9lBWwng9RTr0VyZ5nuFEFNhWR+hplYjz1BJFVkuLJGsyY2cHBw4yCsTJfvAMkaYi/oepeEFcHUXWKVmFkE2MexBXxnmn3vjS+1OXIVjFdjcDwZuHGQQ6+D6DAI06X9l1MUIbLKOt5Np40xAatRiQ9BQmVCfvTtm81HTFE4sIr3DuKp9PFsw1JBsv7vD31clEWSFdYFxZysPC9MJR+BSwFtRkrHwl5XVmH1mpLKVSelI4ixS9lE1vc7Gx8f5rwIDAQAB'>
+    <updatecheck codebase='https://github.com/kwin-wang/chart-rotator/releases/download/v11/chart-rotator.crx' version='11' />
+  </app>
+</gupdate>
