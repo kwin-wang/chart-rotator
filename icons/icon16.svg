@@ -1,14 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-  <!-- 背景圆形 -->
-  <circle cx="8" cy="8" r="8" fill="#4a6cf7"/>
-  
-  <!-- 图表折线 -->
-  <polyline points="2,9 4,6 6,8 8,5 10,7 12,4 14,6" 
-    stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  
-  <!-- 循环箭头 -->
-  <path d="M3,12 A6,6 0 0 0 13,12" 
-    stroke="white" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-  <path d="M13,12 L14.5,10.5 L13,9" 
-    stroke="white" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <rect width="16" height="16" fill="#4a6cf7" rx="3"/>
+  <path d="M3 13V3h3v10H3zm4-5V3h3v5H7zm4-3V3h3v2h-3z" fill="white"/>
 </svg>
