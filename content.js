@@ -170,26 +170,33 @@ window.addEventListener('load', function() {
   isPageLoaded = true;
   // 页面加载完成后，检查是否需要显示倒计时
   chrome.storage.local.get(['isRotating', 'rotationInterval', 'lastRotationTime', 'countdownPosition'], function(data) {
-    if (data.isRotating) {
-      const interval = (data.rotationInterval || 30) * 1000;
-      const lastRotationTime = data.lastRotationTime || Date.now();
-      const now = Date.now();
-      const elapsed = now - lastRotationTime;
-      const secondsLeft = Math.max(0, Math.floor((interval - elapsed) / 1000));
-      
-      // 创建并显示倒计时元素
-      const element = createCountdownElement();
-      element.textContent = `还剩 ${secondsLeft} 秒`;
-      element.style.backgroundColor = 'rgba(74, 108, 247, 0.1)';
-      element.style.color = '#4a6cf7';
-      element.style.display = 'block';
-      
-      // 恢复保存的位置
-      if (data.countdownPosition) {
-        xOffset = data.countdownPosition.x;
-        yOffset = data.countdownPosition.y;
-        setTranslate(xOffset, yOffset, element);
-      }
+    // 如果lastRotationTime为null，表示已停止，不显示倒计时
+    if (data.lastRotationTime === null) {
+      isStopped = true;
+      hideStatus();
+      return;
+    }
+    
+    // 如果不是停止状态，但也不是轮播状态，则是暂停状态
+    if (!data.isRotating) {
+      showStatus(false, 0);
+      return;
+    }
+    
+    // 轮播状态
+    const interval = (data.rotationInterval || 30) * 1000;
+    const lastRotationTime = data.lastRotationTime || Date.now();
+    const now = Date.now();
+    const elapsed = now - lastRotationTime;
+    const secondsLeft = Math.max(0, Math.floor((interval - elapsed) / 1000));
+    
+    showStatus(true, secondsLeft);
+    
+    // 恢复保存的位置
+    if (data.countdownPosition && countdownElement) {
+      xOffset = data.countdownPosition.x;
+      yOffset = data.countdownPosition.y;
+      setTranslate(xOffset, yOffset, countdownElement);
     }
   });
 });
@@ -201,14 +208,19 @@ let statusInterval = setInterval(function() {
     rotationInterval = (data.rotationInterval || 30) * 1000; // 更新轮播间隔时间
     const lastRotationTime = data.lastRotationTime || Date.now();
     
-    if (isRotating) {
-      isStopped = false; // 重置停止状态
+    // 重写逻辑，明确处理停止状态
+    if (isStopped || lastRotationTime === null) {
+      // 如果是停止状态，确保悬浮窗隐藏
+      isStopped = true; // 确保状态一致
+      hideStatus();
+    } else if (isRotating) {
+      // 轮播中状态
       const now = Date.now();
       const elapsed = now - lastRotationTime;
       const secondsLeft = Math.max(0, Math.floor((rotationInterval - elapsed) / 1000));
-      
       showStatus(true, secondsLeft);
-    } else if (!isStopped) { // 如果暂停
+    } else {
+      // 暂停状态
       showStatus(false, 0);
     }
   });
@@ -219,7 +231,7 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   if (message.action === 'hideStatus') {
     isStopped = true; // 设置停止状态
     hideStatus();
-    resetPosition(); // 只在停止时重置位置
+    // 这里不需要再次检查 lastRotationTime，因为我们已经显式设置了 isStopped
   } else if (message.action === 'resetStatus') {
     isStopped = false; // 重置停止状态
     isPageLoaded = false; // 重置页面加载状态

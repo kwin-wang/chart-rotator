@@ -93,10 +93,10 @@ async function stopRotation(shouldReset = false) {
     rotationTimer = null;
   }
   
-  // 更新storage状态
+  // 确保这里正确设置lastRotationTime
   await chrome.storage.local.set({ 
     isRotating: false,
-    lastRotationTime: shouldReset ? null : Date.now() // 如果是停止操作，清除最后轮播时间
+    lastRotationTime: shouldReset ? null : Date.now() // 如果是真正的停止操作，必须设置为null
   });
   
   // 更新图标状态
@@ -104,18 +104,20 @@ async function stopRotation(shouldReset = false) {
     // 如果是停止操作，清除图标文字和背景色
     await chrome.action.setBadgeText({ text: '' });
     await chrome.action.setBadgeBackgroundColor({ color: '#4a6cf7' });
+    
+    // 确保发送隐藏消息到所有打开的相关标签页
+    const tabs = await chrome.tabs.query({});
+    for (const tab of tabs) {
+      try {
+        await chrome.tabs.sendMessage(tab.id, { action: 'hideStatus' });
+      } catch (e) {
+        // 忽略不能接收消息的标签页
+      }
+    }
   } else {
     // 如果是暂停操作，显示暂停图标
     await chrome.action.setBadgeText({ text: '❚❚' });
     await chrome.action.setBadgeBackgroundColor({ color: '#ff9f43' });
-  }
-  
-  // 如果需要重置，发送消息到content script
-  if (shouldReset) {
-    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (tabs.length > 0) {
-      await chrome.tabs.sendMessage(tabs[0].id, { action: 'hideStatus' });
-    }
   }
 }
 
