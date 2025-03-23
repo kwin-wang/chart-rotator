@@ -1,0 +1,82 @@
+/* 分组管理样式 */
+.section {
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
+
+.group-controls {
+  display: flex;
+  margin-bottom: 10px;
+  gap: 5px;
+}
+
+.group-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  margin-bottom: 5px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.group-item button {
+  margin-left: 5px;
+  padding: 2px 5px;
+  font-size: 12px;
+}
+
+/* URL列表中显示分组标签 */
+.url-item .group-tag {
+  font-size: 11px;
+  background-color: #e0e0e0;
+  padding: 2px 5px;
+  border-radius: 3px;
+  margin-left: 5px;
+}
+
+/* 让分组管理区域更明显 */
+#groupsList {
+  max-height: 150px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+/* 添加URL区域样式优化 */
+.input-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.input-controls input,
+.input-controls select {
+  flex: 1;
+  min-width: 100px;
+}
+
+.input-controls button {
+  white-space: nowrap;
+}
+
+/* 让URL列表中的分组标签更醒目 */
+.url-item {
+  position: relative;
+  padding-right: 80px; /* 为分组标签和删除按钮预留空间 */
+}
+
+.url-item .group-tag {
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.url-item .delete-btn {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+} 

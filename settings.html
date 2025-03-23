@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设置 - Chart Rotator</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Chart Rotator 设置</h1>
+    </header>
+    
+    <nav class="tabs">
+      <button class="tab-button active" data-tab="general">基本设置</button>
+      <button class="tab-button" data-tab="groups">分组管理</button>
+      <button class="tab-button" data-tab="urls">URL管理</button>
+    </nav>
+    
+    <div class="tab-content">
+      <!-- 基本设置 -->
+      <div class="tab-pane active" id="general">
+        <h2>基本设置</h2>
+        <div class="form-group">
+          <label for="rotationInterval">轮播间隔(秒):</label>
+          <input type="number" id="rotationInterval" min="5" max="3600" value="30">
+          <p class="help-text">设置每个URL显示的时间(5-3600秒)</p>
+        </div>
+        <div class="form-group">
+          <label>轮播控制:</label>
+          <div class="button-group">
+            <button id="toggleButton">开始</button>
+            <button id="nextButton">下一个</button>
+            <button id="stopButton">停止</button>
+          </div>
+        </div>
+        <div class="status-display" id="statusDisplay">当前显示: -</div>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="enableDebug"> 启用调试模式
+          </label>
+          <p class="help-text">显示扩展的详细调试信息，帮助解决问题</p>
+        </div>
+      </div>
+      
+      <!-- 分组管理 -->
+      <div class="tab-pane" id="groups">
+        <h2>分组管理</h2>
+        <div class="form-group">
+          <label>添加新分组:</label>
+          <div class="input-row">
+            <input type="text" id="groupName" placeholder="分组名称" style="flex: 2;">
+            <input type="number" id="groupFrequency" placeholder="显示频率" min="0" style="flex: 1;">
+            <select id="groupFrequencyUnit">
+              <option value="second">秒</option>
+              <option value="minute" selected>分钟</option>
+              <option value="hour">小时</option>
+            </select>
+            <button id="addGroup">添加分组</button>
+          </div>
+          <p class="help-text">0表示连续轮播（不间隔）</p>
+        </div>
+        <div id="groupsList" class="list">
+          <!-- 分组将在这里动态生成 -->
+        </div>
+      </div>
+      
+      <!-- URL管理 -->
+      <div class="tab-pane" id="urls">
+        <h2>URL管理</h2>
+        <div class="form-group">
+          <label>添加新URL:</label>
+          <div class="input-row">
+            <input type="text" id="targetName" placeholder="标的名称">
+            <input type="text" id="targetUrl" placeholder="URL">
+            <select id="targetGroup">
+              <!-- 分组选项将在这里动态生成 -->
+            </select>
+            <button id="addUrl">添加</button>
+          </div>
+        </div>
+        
+        <!-- 添加备份和导入功能 -->
+        <div class="tool-buttons">
+          <button id="backupUrls" class="tool-button">
+            <span class="icon">⬇️</span> 导出CSV
+          </button>
+          <button id="importUrls" class="tool-button">
+            <span class="icon">⬆️</span> 批量导入
+          </button>
+          <button id="downloadTemplate" class="tool-button">
+            <span class="icon">📋</span> 下载模板
+          </button>
+          <input type="file" id="importUrlsFile" accept=".csv,.json" style="display: none;">
+        </div>
+        
+        <div id="urlList" class="list">
+          <!-- URL列表将在这里动态生成 -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="settings.js"></script>
+</body>
+</html> 

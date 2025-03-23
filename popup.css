@@ -169,3 +169,42 @@
   #stopButton:hover {
     background-color: #ff4757;
   }
+  
+  .group-management-link {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+  }
+  
+  .group-management-link a {
+    color: #0066cc;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  
+  .group-management-link a:hover {
+    text-decoration: underline;
+  }
+  
+  .section {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+  }
+  
+  .input-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+  
+  .input-controls input,
+  .input-controls select {
+    flex: 1;
+    min-width: 100px;
+  }
+  
+  .input-controls button {
+    white-space: nowrap;
+  }
