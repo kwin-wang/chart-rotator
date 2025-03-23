@@ -7,31 +7,62 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Chart Rotator</h1>
-    
-    <div class="input-group">
-      <input type="text" id="chartName" placeholder="标的名称...">
-      <input type="text" id="chartUrl" placeholder="输入图表URL...">
-      <button id="addButton">添加</button>
-    </div>
-    
-    <h2>已添加的URL</h2>
-    <div class="url-list" id="urlList">
-      <!-- URL列表将通过JavaScript动态添加 -->
-    </div>
-    
-    <div class="control-panel">
-      <div id="statusDisplay">当前显示: -</div>
-      <div class="control-buttons">
-        <div class="interval-input">
-          <label for="rotationInterval">轮播间隔(秒):</label>
-          <input type="number" id="rotationInterval" min="5" max="3600" value="30">
+  <div id="mainView">
+    <div class="container">
+      <h1>Chart Rotator</h1>
+      
+      <div class="section">
+        <h3>添加URL</h3>
+        <div class="group-management-link">
+          <!-- 移除分组管理链接部分 -->
         </div>
-        <button id="toggleButton">开始</button>
-        <button id="nextButton">下一个</button>
-        <button id="stopButton">停止</button>
+        <div class="input-controls">
+          <input type="text" id="targetName" placeholder="标的名称">
+          <input type="text" id="targetUrl" placeholder="URL">
+          <select id="targetGroup">
+            <!-- 分组选项将在这里动态生成 -->
+          </select>
+          <button id="addUrl">添加</button>
+        </div>
       </div>
+      
+      <h2>已添加的URL</h2>
+      <div class="url-list" id="urlList">
+        <!-- URL列表将通过JavaScript动态添加 -->
+      </div>
+      
+      <div class="control-panel">
+        <div id="statusDisplay">当前显示: -</div>
+        <div class="control-buttons">
+          <div class="interval-input">
+            <label for="rotationInterval">轮播间隔(秒):</label>
+            <input type="number" id="rotationInterval" min="5" max="3600" value="30">
+          </div>
+          <button id="toggleButton">开始</button>
+          <button id="nextButton">下一个</button>
+          <button id="stopButton">停止</button>
+        </div>
+      </div>
+      
+      <div class="settings-link">
+        <a id="openSettings" href="#">设置</a>
+      </div>
+    </div>
+  </div>
+  
+  <div id="groupManagerView" style="display: none;">
+    <!-- 分组管理内容 -->
+    <a class="back-link" id="backToMainView">← 返回主页</a>
+    <h1>分组管理</h1>
+    
+    <div class="group-controls">
+      <input type="text" id="groupName" placeholder="分组名称" style="flex: 2;">
+      <input type="number" id="groupFrequency" placeholder="显示频率(分钟)" min="0" style="flex: 1;">
+      <button id="addGroup">添加分组</button>
+    </div>
+    
+    <div id="groupsList">
+      <!-- 分组将在这里动态生成 -->
     </div>
   </div>
   
