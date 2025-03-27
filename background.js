@@ -492,7 +492,6 @@ function determineNextUrl() {
           }
           
           // 只有当前URL完成播放后，才查找需要显示的高优先级组（如果有）
-          // 此时无论是持续轮播的组还是高频率组都可以根据优先级轮播
           selectNextUrlBasedOnPriority(state, now).then(result => {
             const { nextGroupId, nextUrl } = result;
             
@@ -512,8 +511,9 @@ function determineNextUrl() {
               chrome.tabs.update(activeRotationTabId, {url: nextUrl.url}, function() {
                 // 检查是否出错
                 if (chrome.runtime.lastError) {
-                  console.log('更新标签页出错，停止轮播:', chrome.runtime.lastError);
-                  stopRotation();
+                  console.log('更新标签页出错，尝试重新开始轮播:', chrome.runtime.lastError);
+                  // 不直接停止轮播，而是尝试重新开始
+                  startRotation();
                   resolve();
                   return;
                 }
@@ -529,14 +529,21 @@ function determineNextUrl() {
                 });
               });
             } else {
+              console.log('找不到下一个URL，尝试重新开始轮播');
+              startRotation();
               resolve();
             }
+          }).catch(error => {
+            console.error('选择下一个URL时出错:', error);
+            // 发生错误时尝试重新开始轮播
+            startRotation();
+            resolve();
           });
         });
       });
     } else {
-      console.log('没有活动的轮播标签页，停止轮播');
-      stopRotation();
+      console.log('没有活动的轮播标签页，尝试重新开始轮播');
+      startRotation();
       resolve();
     }
   });

@@ -444,83 +444,93 @@ function showStatus(isRotating, secondsLeft) {
     
     if (isRotating) { // 如果正在轮播
       if (isPageLoaded) { // 如果页面已加载完成
-        // 确保secondsLeft是有效数字
-        const displaySeconds = (typeof secondsLeft === 'number' && !isNaN(secondsLeft)) 
-          ? Math.max(0, Math.ceil(secondsLeft)) 
-          : 30;
-        
-        // 先设置基本样式
-        element.style.backgroundColor = 'rgba(74, 108, 247, 0.1)';
-        element.style.color = '#4a6cf7';
-        element.style.display = 'block';
-        
-        // 基本信息：剩余时间
-        element.textContent = `还剩 ${displaySeconds} 秒`;
-        
-        // 安全地获取并显示额外信息
-        try {
-          safeGetStorage(['chartRotatorState'], function(data) {
-            if (!data.chartRotatorState || !element) return;
-            
-            const state = data.chartRotatorState;
-            let currentUrlName = '';
-            let currentGroupName = '';
-            
-            // 查找当前URL信息
-            if (state.currentUrlId && state.urls) {
-              const currentUrl = state.urls.find(u => u.id === state.currentUrlId);
-              if (currentUrl) {
-                currentUrlName = currentUrl.name || '';
-                
-                // 查找分组
-                if (state.groups && Array.isArray(state.groups)) {
-                  for (const group of state.groups) {
-                    if (group && group.urlIds && Array.isArray(group.urlIds) && 
-                        group.urlIds.includes(state.currentUrlId)) {
-                      currentGroupName = group.name || '';
-                      break;
+        // 获取实际剩余时间
+        chrome.storage.local.get(['chartRotatorState'], function(data) {
+          if (!data.chartRotatorState) return;
+          
+          const state = data.chartRotatorState;
+          const now = Date.now();
+          const lastRotationTime = state.lastRotationTime || now;
+          const intervalMs = (state.interval || 30) * 1000;
+          const elapsed = now - lastRotationTime;
+          const actualSecondsLeft = Math.max(0, Math.ceil((intervalMs - elapsed) / 1000));
+          
+          // 使用实际计算的剩余时间
+          const displaySeconds = actualSecondsLeft;
+          
+          // 先设置基本样式
+          element.style.backgroundColor = 'rgba(74, 108, 247, 0.1)';
+          element.style.color = '#4a6cf7';
+          element.style.display = 'block';
+          
+          // 基本信息：剩余时间
+          element.textContent = `还剩 ${displaySeconds} 秒`;
+          
+          // 安全地获取并显示额外信息
+          try {
+            safeGetStorage(['chartRotatorState'], function(data) {
+              if (!data.chartRotatorState || !element) return;
+              
+              const state = data.chartRotatorState;
+              let currentUrlName = '';
+              let currentGroupName = '';
+              
+              // 查找当前URL信息
+              if (state.currentUrlId && state.urls) {
+                const currentUrl = state.urls.find(u => u.id === state.currentUrlId);
+                if (currentUrl) {
+                  currentUrlName = currentUrl.name || '';
+                  
+                  // 查找分组
+                  if (state.groups && Array.isArray(state.groups)) {
+                    for (const group of state.groups) {
+                      if (group && group.urlIds && Array.isArray(group.urlIds) && 
+                          group.urlIds.includes(state.currentUrlId)) {
+                        currentGroupName = group.name || '';
+                        break;
+                      }
                     }
                   }
                 }
               }
-            }
-            
-            // 只有当有额外信息时才添加
-            if (currentUrlName || currentGroupName) {
-              // 清除旧内容，保留时间信息
-              const timeInfo = element.textContent;
-              element.textContent = timeInfo;
               
-              // 添加一个分隔符
-              const separator = document.createElement('br');
-              element.appendChild(separator);
-              
-              // 添加URL和组信息
-              const infoText = document.createElement('span');
-              infoText.style.fontSize = '12px';
-              infoText.style.fontWeight = 'normal';
-              
-              let infoContent = '';
-              if (currentUrlName) {
-                infoContent += currentUrlName;
+              // 只有当有额外信息时才添加
+              if (currentUrlName || currentGroupName) {
+                // 清除旧内容，保留时间信息
+                const timeInfo = element.textContent;
+                element.textContent = timeInfo;
+                
+                // 添加一个分隔符
+                const separator = document.createElement('br');
+                element.appendChild(separator);
+                
+                // 添加URL和组信息
+                const infoText = document.createElement('span');
+                infoText.style.fontSize = '12px';
+                infoText.style.fontWeight = 'normal';
+                
+                let infoContent = '';
+                if (currentUrlName) {
+                  infoContent += currentUrlName;
+                }
+                
+                if (currentGroupName) {
+                  infoContent += infoContent ? ` [${currentGroupName}]` : `[${currentGroupName}]`;
+                }
+                
+                infoText.textContent = infoContent;
+                element.appendChild(infoText);
               }
-              
-              if (currentGroupName) {
-                infoContent += infoContent ? ` [${currentGroupName}]` : `[${currentGroupName}]`;
-              }
-              
-              infoText.textContent = infoContent;
-              element.appendChild(infoText);
+            });
+          } catch (infoError) {
+            console.error('获取URL信息时出错:', infoError);
+            // 如果是扩展上下文无效错误，标记扩展为非活动
+            if (infoError && infoError.message && infoError.message.includes('Extension context invalidated')) {
+              extensionActive = false;
             }
-          });
-        } catch (infoError) {
-          console.error('获取URL信息时出错:', infoError);
-          // 如果是扩展上下文无效错误，标记扩展为非活动
-          if (infoError && infoError.message && infoError.message.includes('Extension context invalidated')) {
-            extensionActive = false;
+            // 出错时不影响主要功能继续显示
           }
-          // 出错时不影响主要功能继续显示
-        }
+        });
       } else { // 如果页面未加载完成
         element.textContent = '加载中...';
         element.style.backgroundColor = 'rgba(74, 108, 247, 0.1)';
