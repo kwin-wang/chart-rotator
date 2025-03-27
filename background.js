@@ -511,9 +511,8 @@ function determineNextUrl() {
               chrome.tabs.update(activeRotationTabId, {url: nextUrl.url}, function() {
                 // 检查是否出错
                 if (chrome.runtime.lastError) {
-                  console.log('更新标签页出错，尝试重新开始轮播:', chrome.runtime.lastError);
-                  // 不直接停止轮播，而是尝试重新开始
-                  startRotation();
+                  console.log('更新标签页出错，停止轮播:', chrome.runtime.lastError);
+                  stopRotation();
                   resolve();
                   return;
                 }
@@ -529,21 +528,20 @@ function determineNextUrl() {
                 });
               });
             } else {
-              console.log('找不到下一个URL，尝试重新开始轮播');
-              startRotation();
+              console.log('找不到下一个URL，停止轮播');
+              stopRotation();
               resolve();
             }
           }).catch(error => {
             console.error('选择下一个URL时出错:', error);
-            // 发生错误时尝试重新开始轮播
-            startRotation();
+            stopRotation();
             resolve();
           });
         });
       });
     } else {
-      console.log('没有活动的轮播标签页，尝试重新开始轮播');
-      startRotation();
+      console.log('没有活动的轮播标签页，停止轮播');
+      stopRotation();
       resolve();
     }
   });

@@ -112,19 +112,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 停止按钮点击事件
     stopButton.addEventListener('click', function() {
-      chrome.storage.local.get(['chartList'], function(data) {
-        const chartList = data.chartList || [];
+      chrome.storage.local.get(['chartRotatorState'], function(data) {
+        const state = data.chartRotatorState || defaultState;
         
-        if (chartList.length === 0) {
+        if (state.urls.length === 0) {
           alert('请先添加至少一个URL');
           return;
         }
         
-        // 停止轮播并重置状态
-        chrome.storage.local.set({ 
-          isRotating: false,
-          currentIndex: 0
-        }, function() {
+        // 重置所有状态
+        state.isRunning = false;
+        state.isPaused = false;
+        state.currentUrlId = null;
+        state.lastRotationTime = null;
+        
+        // 保存更新后的状态
+        chrome.storage.local.set({chartRotatorState: state}, function() {
           // 发送消息到后台脚本
           chrome.runtime.sendMessage({ 
             action: 'stopRotation',
