@@ -58,11 +58,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 切换轮播状态
     toggleButton.addEventListener('click', function() {
-      chrome.storage.local.get(['isRotating', 'chartList', 'rotationInterval'], function(data) {
-        const isRotating = data.isRotating || false;
-        const chartList = data.chartList || [];
+      chrome.storage.local.get(['chartRotatorState'], function(data) {
+        const state = data.chartRotatorState || defaultState;
         
-        if (chartList.length === 0) {
+        if (state.urls.length === 0) {
           alert('请先添加至少一个URL');
           return;
         }
@@ -71,11 +70,27 @@ document.addEventListener('DOMContentLoaded', function() {
         saveRotationInterval();
         
         // 切换轮播状态
-        chrome.storage.local.set({ isRotating: !isRotating }, function() {
+        if (state.isRunning) {
+          if (state.isPaused) {
+            // 当前是暂停状态，恢复轮播
+            state.isPaused = false;
+          } else {
+            // 当前是运行状态，暂停轮播
+            state.isPaused = true;
+          }
+        } else {
+          // 当前是停止状态，开始轮播
+          state.isRunning = true;
+          state.isPaused = false;
+        }
+        
+        chrome.storage.local.set({chartRotatorState: state}, function() {
+          const action = state.isRunning 
+            ? (state.isPaused ? 'pauseRotation' : 'startRotation') 
+            : 'stopRotation';
+          
           // 发送消息到后台脚本
-          chrome.runtime.sendMessage({ 
-            action: !isRotating ? 'startRotation' : 'stopRotation' 
-          }, function(response) {
+          chrome.runtime.sendMessage({ action: action }, function(response) {
             console.log('后台脚本响应:', response);
             if (chrome.runtime.lastError) {
               console.error('消息发送错误:', chrome.runtime.lastError);
@@ -97,19 +112,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 停止按钮点击事件
     stopButton.addEventListener('click', function() {
-      chrome.storage.local.get(['chartList'], function(data) {
-        const chartList = data.chartList || [];
+      chrome.storage.local.get(['chartRotatorState'], function(data) {
+        const state = data.chartRotatorState || defaultState;
         
-        if (chartList.length === 0) {
+        if (state.urls.length === 0) {
           alert('请先添加至少一个URL');
           return;
         }
         
-        // 停止轮播并重置状态
-        chrome.storage.local.set({ 
-          isRotating: false,
-          currentIndex: 0
-        }, function() {
+        // 重置所有状态
+        state.isRunning = false;
+        state.isPaused = false;
+        state.currentUrlId = null;
+        state.lastRotationTime = null;
+        
+        // 保存更新后的状态
+        chrome.storage.local.set({chartRotatorState: state}, function() {
           // 发送消息到后台脚本
           chrome.runtime.sendMessage({ 
             action: 'stopRotation',
@@ -209,22 +227,25 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 更新轮播状态显示
     function updateRotationStatus() {
-      chrome.storage.local.get(['isRotating', 'currentIndex', 'chartList'], function(data) {
-        const isRotating = data.isRotating || false;
-        const currentIndex = data.currentIndex || 0;
-        const chartList = data.chartList || [];
+      chrome.storage.local.get(['chartRotatorState'], function(data) {
+        const state = data.chartRotatorState || defaultState;
         
-        if (isRotating) {
-          toggleButton.textContent = '暂停';
+        if (state.isRunning) {
+          toggleButton.textContent = state.isPaused ? '继续' : '暂停';
           toggleButton.classList.add('paused-button');
         } else {
           toggleButton.textContent = '开始';
           toggleButton.classList.remove('paused-button');
         }
         
-        if (chartList.length > 0 && currentIndex < chartList.length) {
-          const currentChart = chartList[currentIndex];
-          statusDisplay.textContent = `当前显示: ${currentChart.name} - ${currentIndex + 1}/${chartList.length}`;
+        if (state.urls.length > 0) {
+          const currentUrl = state.urls.find(u => u.id === state.currentUrlId);
+          if (currentUrl) {
+            const currentIndex = state.urls.findIndex(u => u.id === state.currentUrlId);
+            statusDisplay.textContent = `当前显示: ${currentUrl.name} - ${currentIndex + 1}/${state.urls.length}`;
+          } else {
+            statusDisplay.textContent = '当前显示: -';
+          }
         } else {
           statusDisplay.textContent = '当前显示: -';
         }

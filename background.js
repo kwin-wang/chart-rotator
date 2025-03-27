@@ -492,7 +492,6 @@ function determineNextUrl() {
           }
           
           // 只有当前URL完成播放后，才查找需要显示的高优先级组（如果有）
-          // 此时无论是持续轮播的组还是高频率组都可以根据优先级轮播
           selectNextUrlBasedOnPriority(state, now).then(result => {
             const { nextGroupId, nextUrl } = result;
             
@@ -529,8 +528,14 @@ function determineNextUrl() {
                 });
               });
             } else {
+              console.log('找不到下一个URL，停止轮播');
+              stopRotation();
               resolve();
             }
+          }).catch(error => {
+            console.error('选择下一个URL时出错:', error);
+            stopRotation();
+            resolve();
           });
         });
       });
